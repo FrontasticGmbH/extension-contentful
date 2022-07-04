@@ -53,6 +53,18 @@ export default {
         dataSourcePayload: await contentfulApi.getAsset(config.configuration.assetId),
       };
     },
+    'contentful/locales': async (config: DataSourceConfiguration, context: DataSourceContext) => {
+      const clientConfig = context.frontasticContext?.project.configuration.contentful;
+
+      const contentfulApi = new ContentfulApi(
+        { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
+        getLocale(context.request),
+      );
+
+      return {
+        dataSourcePayload: await contentfulApi.getLocales(),
+      };
+    },
   },
   actions: {
     contentful: ContentfulActions,

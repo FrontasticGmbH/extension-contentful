@@ -33,4 +33,9 @@ export default class BaseApi {
     const data = await this.client.getAsset(id, { locale: this.locale });
     return ContentfulMapper.contentfulAssetToFrontasticAsset(data);
   }
+
+  async getLocales() {
+    const data = await this.client.getLocales();
+    return data;
+  }
 }

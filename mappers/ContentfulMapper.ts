@@ -1,4 +1,4 @@
-import { EntryCollection, Entry, AssetCollection, Asset } from 'contentful';
+import { EntryCollection, Entry, AssetCollection, Asset, LocaleCollection } from 'contentful';
 
 export class ContentfulMapper {
   static contentfulEntriesToFrontasticEntries(entries: EntryCollection<unknown>) {
@@ -15,5 +15,9 @@ export class ContentfulMapper {
 
   static contentfulAssetToFrontasticAsset(asset: Asset) {
     return asset;
+  }
+
+  static contentfulLocalesToFrontasticLocales(locales: LocaleCollection) {
+    return locales;
   }
 }
