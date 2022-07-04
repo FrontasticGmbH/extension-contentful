@@ -36,6 +36,16 @@ export default class BaseApi {
 
   async getLocales() {
     const data = await this.client.getLocales();
-    return data;
+    return ContentfulMapper.contentfulLocalesToFrontasticLocales(data);
+  }
+
+  async getTags() {
+    const data = await this.client.getTags();
+    return ContentfulMapper.contentfulTagsToFrontasticTags(data);
+  }
+
+  async getTag(id: string) {
+    const data = await this.client.getTag(id);
+    return ContentfulMapper.contentfulTagToFrontasticTag(data);
   }
 }

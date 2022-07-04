@@ -65,6 +65,30 @@ export default {
         dataSourcePayload: await contentfulApi.getLocales(),
       };
     },
+    'contentful/tags': async (config: DataSourceConfiguration, context: DataSourceContext) => {
+      const clientConfig = context.frontasticContext?.project.configuration.contentful;
+
+      const contentfulApi = new ContentfulApi(
+        { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
+        getLocale(context.request),
+      );
+
+      return {
+        dataSourcePayload: await contentfulApi.getTags(),
+      };
+    },
+    'contentful/tag': async (config: DataSourceConfiguration, context: DataSourceContext) => {
+      const clientConfig = context.frontasticContext?.project.configuration.contentful;
+
+      const contentfulApi = new ContentfulApi(
+        { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
+        getLocale(context.request),
+      );
+
+      return {
+        dataSourcePayload: await contentfulApi.getTag(config.configuration.tagId),
+      };
+    },
   },
   actions: {
     contentful: ContentfulActions,
