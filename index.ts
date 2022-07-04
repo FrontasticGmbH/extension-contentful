@@ -29,6 +29,30 @@ export default {
         dataSourcePayload: await contentfulApi.getEntry(config.configuration.entryId),
       };
     },
+    'contentful/assets': async (config: DataSourceConfiguration, context: DataSourceContext) => {
+      const clientConfig = context.frontasticContext?.project.configuration.contentful;
+
+      const contentfulApi = new ContentfulApi(
+        { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
+        getLocale(context.request),
+      );
+
+      return {
+        dataSourcePayload: await contentfulApi.getAssets(),
+      };
+    },
+    'contentful/asset': async (config: DataSourceConfiguration, context: DataSourceContext) => {
+      const clientConfig = context.frontasticContext?.project.configuration.contentful;
+
+      const contentfulApi = new ContentfulApi(
+        { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
+        getLocale(context.request),
+      );
+
+      return {
+        dataSourcePayload: await contentfulApi.getAsset(config.configuration.assetId),
+      };
+    },
   },
   actions: {
     contentful: ContentfulActions,
