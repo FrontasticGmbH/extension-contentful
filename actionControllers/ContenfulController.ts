@@ -33,3 +33,83 @@ export const getEntry = async (request: Request, actionContext: ActionContext) =
 
   return response;
 };
+
+export const getAssets = async (request: Request, actionContext: ActionContext) => {
+  const config = actionContext.frontasticContext?.project.configuration.contentful;
+
+  const api = new ContentfulApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
+
+  const data = await api.getAssets();
+
+  const response: Response = {
+    statusCode: 200,
+    body: JSON.stringify(data),
+    sessionData: request.sessionData,
+  };
+
+  return response;
+};
+
+export const getAsset = async (request: Request, actionContext: ActionContext) => {
+  const config = actionContext.frontasticContext?.project.configuration.contentful;
+
+  const api = new ContentfulApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
+
+  const data = await api.getAsset(request.query.id);
+
+  const response: Response = {
+    statusCode: 200,
+    body: JSON.stringify(data),
+    sessionData: request.sessionData,
+  };
+
+  return response;
+};
+
+export const getLocales = async (request: Request, actionContext: ActionContext) => {
+  const config = actionContext.frontasticContext?.project.configuration.contentful;
+
+  const api = new ContentfulApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
+
+  const data = await api.getLocales();
+
+  const response: Response = {
+    statusCode: 200,
+    body: JSON.stringify(data),
+    sessionData: request.sessionData,
+  };
+
+  return response;
+};
+
+export const getTags = async (request: Request, actionContext: ActionContext) => {
+  const config = actionContext.frontasticContext?.project.configuration.contentful;
+
+  const api = new ContentfulApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
+
+  const data = await api.getTags();
+
+  const response: Response = {
+    statusCode: 200,
+    body: JSON.stringify(data),
+    sessionData: request.sessionData,
+  };
+
+  return response;
+};
+
+export const getTag = async (request: Request, actionContext: ActionContext) => {
+  const config = actionContext.frontasticContext?.project.configuration.contentful;
+
+  const api = new ContentfulApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
+
+  const data = await api.getTag(request.query.id);
+
+  const response: Response = {
+    statusCode: 200,
+    body: JSON.stringify(data),
+    sessionData: request.sessionData,
+  };
+
+  return response;
+};
