@@ -1,4 +1,13 @@
-import { EntryCollection, Entry, AssetCollection, Asset, LocaleCollection, TagCollection, Tag } from 'contentful';
+import {
+  EntryCollection,
+  Entry,
+  AssetCollection,
+  Asset,
+  LocaleCollection,
+  TagCollection,
+  Tag,
+  RichTextContent,
+} from 'contentful';
 import { Content } from '@Types/content/Content';
 import { Collection } from '@Types/content/Collection';
 import { Locale as FrontasticContentLocale } from '@Types/content/Locale';
@@ -27,11 +36,15 @@ export class ContentfulMapper {
     return Object.fromEntries(
       Object.entries(fields).map(([key, val]) => [
         key,
-        typeof val === 'string'
-          ? val
-          : this.contentfulAssetAttributesToFrontasticAssetAttributes((val as unknown as Asset).fields),
+        typeof val === 'string' ? val : this.contentfulNonHomogeneousAttributeToFrontasticAttribute(val),
       ]),
     );
+  }
+
+  static contentfulNonHomogeneousAttributeToFrontasticAttribute(val: unknown) {
+    if ((val as RichTextContent).nodeType && (val as RichTextContent).content) return val; //Rich text content
+    if ((val as Asset).sys.type === 'Asset')
+      return this.contentfulAssetAttributesToFrontasticAssetAttributes((val as Asset).fields); //Asset
   }
 
   static contentfulAssetsToFrontasticAssets(assets: AssetCollection): Collection<Content> {
