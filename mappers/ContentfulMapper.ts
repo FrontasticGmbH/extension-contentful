@@ -1,16 +1,6 @@
-import {
-  EntryCollection,
-  Entry,
-  AssetCollection,
-  Asset,
-  LocaleCollection,
-  TagCollection,
-  Tag,
-  RichTextContent,
-} from 'contentful';
+import { EntryCollection, Entry, AssetCollection, Asset, RichTextContent } from 'contentful';
 import { Content } from '@Types/content/Content';
 import { Collection } from '@Types/content/Collection';
-import { Locale as FrontasticContentLocale } from '@Types/content/Locale';
 
 export class ContentfulMapper {
   static contentfulEntriesToFrontasticEntries(entries: EntryCollection<unknown>): Collection<Content> {
@@ -71,40 +61,6 @@ export class ContentfulMapper {
       url: fields.file.url,
       width: fields.file.details.image.width,
       height: fields.file.details.image.height,
-    };
-  }
-
-  static contentfulLocalesToFrontasticLocales(locales: LocaleCollection): Collection<FrontasticContentLocale> {
-    return {
-      total: locales.total,
-      skip: locales.skip,
-      limit: locales.limit,
-      items: locales.items.map((locale) => ({
-        id: locale.sys.id,
-        code: locale.code,
-        name: locale.name,
-        default: locale.default,
-        fallbackCode: locale.fallbackCode,
-      })),
-    };
-  }
-
-  static contentfulTagsToFrontasticTags(tags: TagCollection): Collection<Content> {
-    return {
-      total: tags.total,
-      skip: tags.skip,
-      limit: tags.limit,
-      items: tags.items.map((tag) => this.contentfulTagToFrontasticTag(tag)),
-    };
-  }
-
-  static contentfulTagToFrontasticTag(tag: Tag): Content {
-    return {
-      contentId: tag.sys.id,
-      contentTypeId: 'tag',
-      name: tag.sys.type,
-      slug: tag.sys.type.toLowerCase(),
-      attributes: {},
     };
   }
 }
