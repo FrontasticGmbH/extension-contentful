@@ -7,7 +7,11 @@ export default class BaseApi {
 
   constructor(params: CreateClientParams, locale?: string) {
     this.client = createClient(params);
-    this.locale = locale.replace('_', '-');
+    this.locale = this.mapLocale(locale);
+  }
+
+  private mapLocale(locale?: string) {
+    return { en: 'en-US' }[locale ?? ''] ?? 'en-US';
   }
 
   async getEntries() {
