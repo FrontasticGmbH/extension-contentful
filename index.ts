@@ -5,7 +5,7 @@ import { getLocale } from './utils/Request';
 
 export default {
   'data-sources': {
-    'contentful/entries': async (config: DataSourceConfiguration, context: DataSourceContext) => {
+    'frontastic/content-list': async (config: DataSourceConfiguration, context: DataSourceContext) => {
       const clientConfig = context.frontasticContext?.project.configuration.contentful;
 
       const contentfulApi = new ContentfulApi(
@@ -17,7 +17,7 @@ export default {
         dataSourcePayload: await contentfulApi.getEntries(),
       };
     },
-    'contentful/entry': async (config: DataSourceConfiguration, context: DataSourceContext) => {
+    'frontastic/content': async (config: DataSourceConfiguration, context: DataSourceContext) => {
       const clientConfig = context.frontasticContext?.project.configuration.contentful;
 
       const contentfulApi = new ContentfulApi(
@@ -29,7 +29,7 @@ export default {
         dataSourcePayload: await contentfulApi.getEntry(config.configuration.entryId),
       };
     },
-    'contentful/assets': async (config: DataSourceConfiguration, context: DataSourceContext) => {
+    'frontastic/asset-list': async (config: DataSourceConfiguration, context: DataSourceContext) => {
       const clientConfig = context.frontasticContext?.project.configuration.contentful;
 
       const contentfulApi = new ContentfulApi(
@@ -41,7 +41,7 @@ export default {
         dataSourcePayload: await contentfulApi.getAssets(),
       };
     },
-    'contentful/asset': async (config: DataSourceConfiguration, context: DataSourceContext) => {
+    'frontastic/asset': async (config: DataSourceConfiguration, context: DataSourceContext) => {
       const clientConfig = context.frontasticContext?.project.configuration.contentful;
 
       const contentfulApi = new ContentfulApi(
