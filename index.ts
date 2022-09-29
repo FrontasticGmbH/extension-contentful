@@ -1,6 +1,6 @@
 import { DataSourceConfiguration, DataSourceContext, ExtensionRegistry } from '@frontastic/extension-types';
-import ContentfulApi from './apis/BaseApi';
-import * as ContentfulActions from './actionControllers/ContenfulController';
+import ContentApi from './apis/ContentApi';
+import * as ContentActions from './actionControllers/ContentController';
 import { getLocale } from './utils/Request';
 
 export default {
@@ -8,53 +8,53 @@ export default {
     'frontastic/content-list': async (config: DataSourceConfiguration, context: DataSourceContext) => {
       const clientConfig = context.frontasticContext?.project.configuration.contentful;
 
-      const contentfulApi = new ContentfulApi(
+      const contentApi = new ContentApi(
         { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
         getLocale(context.request),
       );
 
       return {
-        dataSourcePayload: await contentfulApi.getEntries(),
+        dataSourcePayload: await contentApi.getEntries(),
       };
     },
     'frontastic/content': async (config: DataSourceConfiguration, context: DataSourceContext) => {
       const clientConfig = context.frontasticContext?.project.configuration.contentful;
 
-      const contentfulApi = new ContentfulApi(
+      const contentApi = new ContentApi(
         { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
         getLocale(context.request),
       );
 
       return {
-        dataSourcePayload: await contentfulApi.getEntry(config.configuration.entryId),
+        dataSourcePayload: await contentApi.getEntry(config.configuration.entryId),
       };
     },
     'frontastic/asset-list': async (config: DataSourceConfiguration, context: DataSourceContext) => {
       const clientConfig = context.frontasticContext?.project.configuration.contentful;
 
-      const contentfulApi = new ContentfulApi(
+      const contentApi = new ContentApi(
         { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
         getLocale(context.request),
       );
 
       return {
-        dataSourcePayload: await contentfulApi.getAssets(),
+        dataSourcePayload: await contentApi.getAssets(),
       };
     },
     'frontastic/asset': async (config: DataSourceConfiguration, context: DataSourceContext) => {
       const clientConfig = context.frontasticContext?.project.configuration.contentful;
 
-      const contentfulApi = new ContentfulApi(
+      const contentApi = new ContentApi(
         { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
         getLocale(context.request),
       );
 
       return {
-        dataSourcePayload: await contentfulApi.getAsset(config.configuration.assetId),
+        dataSourcePayload: await contentApi.getAsset(config.configuration.assetId),
       };
     },
   },
   actions: {
-    contentful: ContentfulActions,
+    content: ContentActions,
   },
 } as ExtensionRegistry;

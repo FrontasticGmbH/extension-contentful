@@ -1,7 +1,7 @@
 import { createClient, ContentfulClientApi, CreateClientParams } from 'contentful';
 import { ContentfulMapper } from '../mappers/ContentfulMapper';
 
-export default class BaseApi {
+export default class ContentApi {
   private client: ContentfulClientApi;
   private locale: string;
 

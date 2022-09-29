@@ -1,6 +1,6 @@
 import { ActionContext, Request, Response } from '@frontastic/extension-types/src/ts/index';
 import { getLocale } from '../utils/Request';
-import ContentfulApi from '../apis/BaseApi';
+import ContentfulApi from '../../../../../saas/project-libraries/extensions/content-contentful/apis/ContentApi';
 
 export const getEntries = async (request: Request, actionContext: ActionContext) => {
   const config = actionContext.frontasticContext?.project.configuration.contentful;
