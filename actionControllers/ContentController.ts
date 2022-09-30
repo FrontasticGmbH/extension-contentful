@@ -1,61 +1,15 @@
 import { ActionContext, Request, Response } from '@frontastic/extension-types/src/ts/index';
 import { getLocale } from '../utils/Request';
-import ContentfulApi from '../../../../../saas/project-libraries/extensions/content-contentful/apis/ContentApi';
+import ContentApi from '../apis/ContentApi';
 
-export const getEntries = async (request: Request, actionContext: ActionContext) => {
+type ActionHook = (request: Request, actionContext: ActionContext) => Promise<Response>;
+
+export const getContent: ActionHook = async (request: Request, actionContext: ActionContext) => {
   const config = actionContext.frontasticContext?.project.configuration.contentful;
 
-  const api = new ContentfulApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
+  const contentApi = new ContentApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
 
-  const data = await api.getEntries();
-
-  const response: Response = {
-    statusCode: 200,
-    body: JSON.stringify(data),
-    sessionData: request.sessionData,
-  };
-
-  return response;
-};
-
-export const getEntry = async (request: Request, actionContext: ActionContext) => {
-  const config = actionContext.frontasticContext?.project.configuration.contentful;
-
-  const api = new ContentfulApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
-
-  const data = await api.getEntry(request.query.id);
-
-  const response: Response = {
-    statusCode: 200,
-    body: JSON.stringify(data),
-    sessionData: request.sessionData,
-  };
-
-  return response;
-};
-
-export const getAssets = async (request: Request, actionContext: ActionContext) => {
-  const config = actionContext.frontasticContext?.project.configuration.contentful;
-
-  const api = new ContentfulApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
-
-  const data = await api.getAssets();
-
-  const response: Response = {
-    statusCode: 200,
-    body: JSON.stringify(data),
-    sessionData: request.sessionData,
-  };
-
-  return response;
-};
-
-export const getAsset = async (request: Request, actionContext: ActionContext) => {
-  const config = actionContext.frontasticContext?.project.configuration.contentful;
-
-  const api = new ContentfulApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
-
-  const data = await api.getAsset(request.query.id);
+  const data = await contentApi.getContent(request.query.id);
 
   const response: Response = {
     statusCode: 200,

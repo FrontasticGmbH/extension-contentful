@@ -1,59 +1,39 @@
-import { EntryCollection, Entry, AssetCollection, Asset, RichTextContent } from 'contentful';
+import { Entry, Asset, RichTextContent } from 'contentful';
 import { Content } from '@Types/content/Content';
-import { Collection } from '@Types/content/Collection';
+import { Attribute } from '@Types/content/Attribute';
 
 export class ContentfulMapper {
-  static contentfulEntriesToFrontasticEntries(entries: EntryCollection<unknown>): Collection<Content> {
+  static contentfulEntryToContent(contentfulEntry: Entry<unknown>): Content {
+    const attributes = this.convertContent(contentfulEntry, contentfulEntry.fields);
+
     return {
-      total: entries.total,
-      skip: entries.skip,
-      limit: entries.limit,
-      items: entries.items.map((item) => this.contentfulEntryToFrontasticEntry(item)),
+      contentId: contentfulEntry.sys.id,
+      contentTypeId: contentfulEntry.sys.contentType.sys.id,
+      name: contentfulEntry.sys.id, // TODO: get the display field value for the content type
+      slug: contentfulEntry.sys.id, // TODO: asses if we need this field for all content or can be consider an attribute
+      attributes: attributes,
     };
   }
 
-  static contentfulEntryToFrontasticEntry(entry: Entry<unknown>): Content {
-    return {
-      contentId: entry.sys.id,
-      contentTypeId: entry.sys.contentType.sys.id,
-      name: entry.sys.type,
-      slug: entry.sys.type.toLowerCase(),
-      attributes: this.contentfulEntryAttributesToFrontasticEntryAttributes(entry.fields),
-    };
-  }
+  static convertContent(entry: Entry<unknown> | undefined, fields: unknown): Attribute[] {
+    const attributes: Attribute[] = [];
 
-  static contentfulEntryAttributesToFrontasticEntryAttributes(fields: unknown) {
-    return Object.fromEntries(
-      Object.entries(fields).map(([key, val]) => [
-        key,
-        typeof val === 'string' ? val : this.contentfulNonHomogeneousAttributeToFrontasticAttribute(val),
-      ]),
-    );
+    for (const [key, value] of Object.entries(fields)) {
+      const attribute: Attribute = {
+        attributeId: key,
+        content: typeof value === 'string' ? value : this.contentfulNonHomogeneousAttributeToFrontasticAttribute(value),
+      };
+
+      attributes.push(attribute);
+    }
+
+    return attributes;
   }
 
   static contentfulNonHomogeneousAttributeToFrontasticAttribute(val: unknown) {
     if ((val as RichTextContent).nodeType && (val as RichTextContent).content) return val; //Rich text content
-    if ((val as Asset).sys.type === 'Asset')
+    if ((val as Asset).sys?.type === 'Asset')
       return this.contentfulAssetAttributesToFrontasticAssetAttributes((val as Asset).fields); //Asset
-  }
-
-  static contentfulAssetsToFrontasticAssets(assets: AssetCollection): Collection<Content> {
-    return {
-      total: assets.total,
-      skip: assets.skip,
-      limit: assets.limit,
-      items: assets.items.map((asset) => this.contentfulAssetToFrontasticAsset(asset)),
-    };
-  }
-
-  static contentfulAssetToFrontasticAsset(asset: Asset): Content {
-    return {
-      contentId: asset.sys.id,
-      contentTypeId: 'asset',
-      name: asset.sys.type,
-      slug: asset.sys.type.toLowerCase(),
-      attributes: this.contentfulAssetAttributesToFrontasticAssetAttributes(asset.fields),
-    };
   }
 
   static contentfulAssetAttributesToFrontasticAssetAttributes(fields: Asset['fields']) {
