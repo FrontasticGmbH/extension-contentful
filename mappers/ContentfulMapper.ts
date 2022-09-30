@@ -4,7 +4,7 @@ import { Attribute } from '@Types/content/Attribute';
 
 export class ContentfulMapper {
   static contentfulEntryToContent(contentfulEntry: Entry<unknown>): Content {
-    const attributes = this.convertContent(contentfulEntry, contentfulEntry.fields);
+    const attributes = this.convertContent(contentfulEntry.fields);
 
     return {
       contentId: contentfulEntry.sys.id,
@@ -15,12 +15,13 @@ export class ContentfulMapper {
     };
   }
 
-  static convertContent(entry: Entry<unknown> | undefined, fields: unknown): Attribute[] {
+  static convertContent(fields: unknown): Attribute[] {
     const attributes: Attribute[] = [];
 
     for (const [key, value] of Object.entries(fields)) {
       const attribute: Attribute = {
         attributeId: key,
+        // TODO: implement a method that can parse non string fields
         content: typeof value === 'string' ? value : this.contentfulNonHomogeneousAttributeToFrontasticAttribute(value),
       };
 
@@ -30,12 +31,14 @@ export class ContentfulMapper {
     return attributes;
   }
 
-  static contentfulNonHomogeneousAttributeToFrontasticAttribute(val: unknown) {
-    if ((val as RichTextContent).nodeType && (val as RichTextContent).content) return val; //Rich text content
-    if ((val as Asset).sys?.type === 'Asset')
-      return this.contentfulAssetAttributesToFrontasticAssetAttributes((val as Asset).fields); //Asset
+  // TODO: refactor method to parse attributes
+  static contentfulNonHomogeneousAttributeToFrontasticAttribute(value: unknown) {
+    if ((value as RichTextContent).nodeType && (value as RichTextContent).content) return value;
+    if ((value as Asset).sys?.type === 'Asset')
+      return this.contentfulAssetAttributesToFrontasticAssetAttributes((value as Asset).fields);
   }
 
+  // TODO: refactor method to parse attributes
   static contentfulAssetAttributesToFrontasticAssetAttributes(fields: Asset['fields']) {
     return {
       url: fields.file.url,

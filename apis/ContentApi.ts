@@ -11,6 +11,7 @@ export default class ContentApi {
   }
 
   private mapLocale(locale?: string) {
+    // TODO: update locales so it's not using  a hard coded value
     return { en: 'en-US' }[locale ?? ''] ?? 'en-US';
   }
 
