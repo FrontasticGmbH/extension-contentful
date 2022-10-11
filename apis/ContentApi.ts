@@ -17,6 +17,8 @@ export default class ContentApi {
 
   async getContent(id: string) {
     const contentfulEntry = await this.client.getEntry(id, { locale: this.locale });
-    return ContentfulMapper.contentfulEntryToContent(contentfulEntry);
+    const contentfulContentType = await this.client.getContentType(contentfulEntry.sys.contentType.sys.id);
+
+    return ContentfulMapper.contentfulEntryToContent(contentfulEntry, contentfulContentType);
   }
 }

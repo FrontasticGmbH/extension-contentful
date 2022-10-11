@@ -1,22 +1,36 @@
-import { Entry, Asset, RichTextContent } from 'contentful';
-import { Content } from '@Types/content/Content';
+import { Entry, Asset, RichTextContent, ContentType } from 'contentful';
+import { Attributes, Content } from '@Types/content/Content';
 import { Attribute } from '@Types/content/Attribute';
 
 export class ContentfulMapper {
-  static contentfulEntryToContent(contentfulEntry: Entry<unknown>): Content {
-    const attributes = this.convertContent(contentfulEntry.fields);
+  static contentfulEntryToContent(contentfulEntry: Entry<unknown>, contentfulContentType: ContentType): Content {
+    const attributes = this.convertToAttributes(contentfulEntry.fields);
 
-    return {
+    const content: Content = {
       contentId: contentfulEntry.sys.id,
       contentTypeId: contentfulEntry.sys.contentType.sys.id,
-      name: contentfulEntry.sys.id, // TODO: get the display field value for the content type
-      slug: contentfulEntry.sys.id, // TODO: asses if we need this field for all content or can be consider an attribute
-      attributes: attributes,
     };
+
+    if (
+      attributes.hasOwnProperty(contentfulContentType.displayField) &&
+      typeof attributes[contentfulContentType.displayField].content === 'string'
+    ) {
+      content.name = attributes[contentfulContentType.displayField].content as string;
+    }
+
+    // TODO: asses if we need this field for all content or can be consider an attribute
+    const slugAttributeName = 'slug';
+    if (attributes.hasOwnProperty(slugAttributeName) && typeof attributes[slugAttributeName].content === 'string') {
+      content.slug = attributes[slugAttributeName].content as string;
+    }
+
+    content.attributes = attributes;
+
+    return content;
   }
 
-  static convertContent(fields: unknown): Attribute[] {
-    const attributes: Attribute[] = [];
+  static convertToAttributes(fields: unknown): Attributes {
+    const attributes: Attributes = {};
 
     for (const [key, value] of Object.entries(fields)) {
       const attribute: Attribute = {
@@ -25,7 +39,7 @@ export class ContentfulMapper {
         content: typeof value === 'string' ? value : this.contentfulNonHomogeneousAttributeToFrontasticAttribute(value),
       };
 
-      attributes.push(attribute);
+      attributes[key] = attribute;
     }
 
     return attributes;
