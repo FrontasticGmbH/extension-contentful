@@ -1,6 +1,7 @@
-import { Entry, Asset, RichTextContent, ContentType } from 'contentful';
+import { Entry, Asset as ContentfulAsset, RichTextContent, ContentType } from 'contentful';
 import { Attributes, Content } from '@Types/content/Content';
 import { Attribute } from '@Types/content/Attribute';
+import { Asset } from '@Types/content/Asset';
 
 export class ContentfulMapper {
   static contentfulEntryToContent(contentfulEntry: Entry<unknown>, contentfulContentType: ContentType): Content {
@@ -48,16 +49,14 @@ export class ContentfulMapper {
   // TODO: refactor method to parse attributes
   static contentfulNonHomogeneousAttributeToFrontasticAttribute(value: unknown) {
     if ((value as RichTextContent).nodeType && (value as RichTextContent).content) return value;
-    if ((value as Asset).sys?.type === 'Asset')
-      return this.contentfulAssetAttributesToFrontasticAssetAttributes((value as Asset).fields);
+    if ((value as ContentfulAsset).sys?.type === 'Asset') return this.contentfulAsseToAsset(value as ContentfulAsset);
   }
 
-  // TODO: refactor method to parse attributes
-  static contentfulAssetAttributesToFrontasticAssetAttributes(fields: Asset['fields']) {
+  static contentfulAsseToAsset(contentfulAsset: ContentfulAsset): Asset {
     return {
-      url: fields.file.url,
-      width: fields.file.details.image.width,
-      height: fields.file.details.image.height,
+      url: contentfulAsset.fields.file.url,
+      title: contentfulAsset.fields.title,
+      description: contentfulAsset.fields.description,
     };
   }
 }
