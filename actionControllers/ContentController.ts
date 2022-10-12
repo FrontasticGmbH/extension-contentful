@@ -5,9 +5,7 @@ import ContentApi from '../apis/ContentApi';
 type ActionHook = (request: Request, actionContext: ActionContext) => Promise<Response>;
 
 export const getContent: ActionHook = async (request: Request, actionContext: ActionContext) => {
-  const config = actionContext.frontasticContext?.project.configuration.contentful;
-
-  const contentApi = new ContentApi({ space: config.spaceId, accessToken: config.accessToken }, getLocale(request));
+  const contentApi = new ContentApi(actionContext.frontasticContext, getLocale(request));
 
   const data = await contentApi.getContent(request.query.id);
 

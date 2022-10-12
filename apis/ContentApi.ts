@@ -1,18 +1,21 @@
-import { createClient, ContentfulClientApi, CreateClientParams } from 'contentful';
+import { createClient, ContentfulClientApi } from 'contentful';
 import { ContentfulMapper } from '../mappers/ContentfulMapper';
+import { Context } from '@frontastic/extension-types';
 
 export default class ContentApi {
   private client: ContentfulClientApi;
   private locale: string;
 
-  constructor(params: CreateClientParams, locale?: string) {
-    this.client = createClient(params);
-    this.locale = this.mapLocale(locale);
+  constructor(frontasticContext: Context, locale?: string) {
+    this.client = createClient({
+      space: frontasticContext.project.configuration?.contentful.spaceId,
+      accessToken: frontasticContext.project.configuration?.contentful.accessToken,
+    });
+    this.locale = this.formatLocale(locale !== null ? locale : frontasticContext.project.defaultLocale);
   }
 
-  private mapLocale(locale?: string) {
-    // TODO: update locales so it's not using  a hard coded value
-    return { en: 'en-US' }[locale ?? ''] ?? 'en-US';
+  private formatLocale(locale: string) {
+    return locale.replace('_', '-');
   }
 
   async getContent(id: string) {
