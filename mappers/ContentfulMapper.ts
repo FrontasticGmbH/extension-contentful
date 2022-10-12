@@ -1,55 +1,66 @@
-import { Entry, Asset as ContentfulAsset, RichTextContent, ContentType } from 'contentful';
+import { Entry, Asset as ContentfulAsset, ContentType, EntryFields, RichTextContent } from 'contentful';
 import { Attributes, Content } from '@Types/content/Content';
-import { Attribute } from '@Types/content/Attribute';
 import { Asset } from '@Types/content/Asset';
+import RichText = EntryFields.RichText;
 
 export class ContentfulMapper {
   static contentfulEntryToContent(contentfulEntry: Entry<unknown>, contentfulContentType: ContentType): Content {
-    const attributes = this.convertToAttributes(contentfulEntry.fields);
+    const attributes = this.contentfulFieldsToAttributes(contentfulEntry.fields, contentfulContentType);
 
-    const content: Content = {
+    return {
       contentId: contentfulEntry.sys.id,
       contentTypeId: contentfulEntry.sys.contentType.sys.id,
+      name:
+        attributes.hasOwnProperty(contentfulContentType.displayField) &&
+        typeof attributes[contentfulContentType.displayField].content === 'string'
+          ? (attributes[contentfulContentType.displayField].content as string)
+          : undefined,
+      attributes: attributes,
     };
-
-    if (
-      attributes.hasOwnProperty(contentfulContentType.displayField) &&
-      typeof attributes[contentfulContentType.displayField].content === 'string'
-    ) {
-      content.name = attributes[contentfulContentType.displayField].content as string;
-    }
-
-    // TODO: asses if we need this field for all content or can be consider an attribute
-    const slugAttributeName = 'slug';
-    if (attributes.hasOwnProperty(slugAttributeName) && typeof attributes[slugAttributeName].content === 'string') {
-      content.slug = attributes[slugAttributeName].content as string;
-    }
-
-    content.attributes = attributes;
-
-    return content;
   }
 
-  static convertToAttributes(fields: unknown): Attributes {
+  static contentfulFieldsToAttributes(fields: unknown, contentfulContentType: ContentType): Attributes {
     const attributes: Attributes = {};
 
     for (const [key, value] of Object.entries(fields)) {
-      const attribute: Attribute = {
+      attributes[key] = {
         attributeId: key,
-        // TODO: implement a method that can parse non string fields
-        content: typeof value === 'string' ? value : this.contentfulNonHomogeneousAttributeToFrontasticAttribute(value),
+        content:
+          typeof value === 'string' || typeof value === 'number'
+            ? value.toString()
+            : this.contentfulCompoundAttributeToAttributeContent(value),
+        type: contentfulContentType.fields.find((field) => {
+          return field.id === key;
+        })?.type,
       };
-
-      attributes[key] = attribute;
     }
 
     return attributes;
   }
 
-  // TODO: refactor method to parse attributes
-  static contentfulNonHomogeneousAttributeToFrontasticAttribute(value: unknown) {
-    if ((value as RichTextContent).nodeType && (value as RichTextContent).content) return value;
-    if ((value as ContentfulAsset).sys?.type === 'Asset') return this.contentfulAsseToAsset(value as ContentfulAsset);
+  static contentfulCompoundAttributeToAttributeContent(value: unknown) {
+    if ((value as ContentfulAsset).sys?.type === 'Asset') {
+      return this.contentfulAsseToAsset(value as ContentfulAsset);
+    }
+    if ((value as RichText).data && (value as RichText).content && (value as RichText).nodeType == 'document') {
+      return this.contentfulRichTextContentListToContentList((value as RichText).content);
+    }
+
+    // If the value type was not identify, we return the raw data as a key value pair.
+    const content: { [key: string]: unknown } = {};
+
+    for (const [key, data] of Object.entries(value)) {
+      content[key] = data;
+    }
+    return content;
+  }
+
+  static contentfulRichTextContentListToContentList(richTextContentList: RichTextContent[]) {
+    // The current Contentful library used (^9.2.5) seems to be returning different types than the ones
+    // defined in their library. To avoid missing any data, we are returning the raw data received.
+    return richTextContentList.map((richTextContent) => {
+      return richTextContent;
+    });
   }
 
   static contentfulAsseToAsset(contentfulAsset: ContentfulAsset): Asset {
