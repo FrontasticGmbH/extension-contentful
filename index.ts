@@ -6,12 +6,7 @@ import { getLocale } from './utils/Request';
 export default {
   'data-sources': {
     'frontastic/content': async (config: DataSourceConfiguration, context: DataSourceContext) => {
-      const clientConfig = context.frontasticContext?.project.configuration.contentful;
-
-      const contentApi = new ContentApi(
-        { space: clientConfig.spaceId, accessToken: clientConfig.accessToken },
-        getLocale(context.request),
-      );
+      const contentApi = new ContentApi(context.frontasticContext, getLocale(context.request));
 
       return {
         dataSourcePayload: await contentApi.getContent(config.configuration.entryId),
