@@ -9,7 +9,7 @@ export default {
       const contentApi = new ContentApi(context.frontasticContext, getLocale(context.request));
 
       return {
-        dataSourcePayload: await contentApi.getContent(config.configuration.entryId),
+        dataSourcePayload: await contentApi.getContent(config.configuration.contentId),
       };
     },
   },
