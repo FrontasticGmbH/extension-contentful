@@ -8,9 +8,18 @@ export default {
     'frontastic/content': async (config: DataSourceConfiguration, context: DataSourceContext) => {
       const contentApi = new ContentApi(context.frontasticContext, getLocale(context.request));
 
-      return {
-        dataSourcePayload: await contentApi.getContent(config.configuration.contentId),
-      };
+      return await contentApi.getContent(config.configuration.contentId).then((contentResult) => {
+        return !context.isPreview
+          ? { dataSourcePayload: contentResult }
+          : {
+              dataSourcePayload: contentResult,
+              previewPayload: [
+                {
+                  title: contentResult.name,
+                },
+              ],
+            };
+      });
     },
   },
   actions: {
